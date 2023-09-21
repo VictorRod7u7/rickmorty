@@ -3,10 +3,10 @@
     <div class="text-center">
       <div class="input-group mt-4">
         <input
-          type="text"
+          type="number"
           class="form-control"
-          placeholder="Buscar por locación..."
-          v-model="searchQuery"
+          placeholder="Buscar por ID de locación..."
+          v-model.number="searchQuery"
           @input="handleInput"
         />
         <button class="btn btn-primary" @click="performSearch">Buscar</button>
@@ -24,42 +24,32 @@
           />
           <div class="card-body">
             <h5 class="card-title">{{ resident.name }}</h5>
-            <p class="card-text">Status: {{ resident.status }}</p>
-            <p class="card-text">Species: {{ resident.species }}</p>
-            <p class="card-text">Origin: {{ resident.origin }}</p>
-            <p class="card-text">
-              Episodes:
-              <span
-                v-for="(episode, eIndex) in resident.episodes"
-                :key="eIndex"
-              >
-                <a :href="episode.url">Episode {{ eIndex + 1 }}</a>
-              </span>
-            </p>
           </div>
         </div>
       </div>
     </div>
+    <CharacterModal
+      :character="selectedCharacter"
+      @close="closeCharacterModal"
+    />
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import Swal from "sweetalert2";
+import CharacterModal from "./CharacterModal.vue";
 
 export default {
   name: "LocationSearch",
   data() {
     return {
       searchQuery: "",
-      residents: [], // Agregamos la propiedad residents
-      locationData: null, // Agrega locationData como propiedad de datos
+      residents: [],
+      selectedCharacter: null,
     };
   },
   methods: {
-    handleInput() {
-      // Manejar cambios en el input si es necesario
-    },
     async performSearch() {
       try {
         const response = await axios.get(
@@ -68,18 +58,15 @@ export default {
 
         const locationData = response.data;
 
-        // Verifica si residents está vacío
         if (!locationData.residents || locationData.residents.length === 0) {
-          // Muestra una alerta indicando que no hay personajes
           Swal.fire({
             icon: "info",
             title: "Información",
             text: "No hay personajes en esta ubicación.",
           });
-          return; // Sale de la función
+          return;
         }
 
-        // Realizar una consulta separada para cada residente
         const residentPromises = locationData.residents
           .slice(0, 5)
           .map(async (residentUrl) => {
@@ -88,10 +75,8 @@ export default {
             return this.mapResidentData(residentData);
           });
 
-        // Esperar a que todas las consultas se completen
         this.residents = await Promise.all(residentPromises);
 
-        // Evaluar el ID de la localización y cambiar el color de fondo
         const locationId = parseInt(locationData.id);
         if (!isNaN(locationId)) {
           if (locationId < 50) {
@@ -111,28 +96,28 @@ export default {
     mapResidentData(resident) {
       return {
         name: resident.name || "Nombre Desconocido",
-        status: resident.status || "Estado Desconocido",
-        species: resident.species || "Especie Desconocida",
-        origin: resident.origin ? resident.origin.name : "Origen Desconocido",
         image: resident.image || "URL de Imagen Desconocida",
-        episodes: resident.episode
-          ? resident.episode.slice(0, 3).map((episodeUrl) => {
-              return { url: episodeUrl };
-            })
-          : [], // Si episode no existe, asignamos un arreglo vacío
       };
     },
 
     changeCursorStyle(isHovered) {
       document.body.style.cursor = isHovered ? "pointer" : "default";
     },
+
     showCharacterModal(character) {
-      this.$emit("show-character-modal", character);
+      this.selectedCharacter = character;
+    },
+
+    closeCharacterModal() {
+      this.selectedCharacter = null;
     },
   },
   beforeUnmount() {
     document.body.style.backgroundColor = "white";
     document.body.style.color = "black";
+  },
+  components: {
+    CharacterModal,
   },
 };
 </script>
