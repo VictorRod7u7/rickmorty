@@ -18,6 +18,7 @@
             alt="Imagen del personaje"
             @mouseover="showCharacterModal(resident)"
             @mouseout="closeCharacterModal"
+            style="cursor: pointer"
           />
           <div class="card-body">
             <h5 class="card-title">{{ resident.name }}</h5>
@@ -34,13 +35,11 @@
 
 <script>
 import LocationSearch from "./components/LocationSearch.vue";
-import CharacterModal from "./components/CharacterModal.vue";
 
 export default {
   name: "App",
   components: {
     LocationSearch,
-    CharacterModal,
   },
   data() {
     return {
@@ -49,12 +48,10 @@ export default {
       selectedCharacter: null,
     };
   },
-
   methods: {
     handleLocationData(locationData) {
       this.locationData = locationData;
     },
-
     showCharacterModal(character) {
       this.selectedCharacter = character;
     },
