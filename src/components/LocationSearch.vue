@@ -8,6 +8,7 @@
           placeholder="Buscar por ID de locación..."
           v-model.number="searchQuery"
           @input="handleInput"
+          @keydown.enter="performSearch"
         />
         <button class="btn btn-primary" @click="performSearch">Buscar</button>
       </div>
@@ -98,10 +99,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.character-tooltip {
-  max-width: 200px;
-  text-align: left;
-}
-</style>
