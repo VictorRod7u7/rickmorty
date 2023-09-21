@@ -22,7 +22,6 @@
 <script>
 import LocationSearch from "./components/LocationSearch.vue";
 import ResidentCard from "./components/ResidentCard.vue";
-import CharacterModal from "./components/CharacterModal.vue";
 import { mapState } from "vuex";
 
 export default {
@@ -30,7 +29,6 @@ export default {
   components: {
     LocationSearch,
     ResidentCard,
-    CharacterModal,
   },
   beforeUnmount() {
     document.body.style.backgroundColor = "white";
